@@ -26,6 +26,3 @@ void ImageDampen(Image* source, Image dampenImage);
 //Image gens
 Image GenImagePerlinNoiseChunk(int width, int height, int offsetX, int offsetY, float scale, int octaves, float persistence, float lacunarity);
 Image GenImageNoiseToColor(Image* source);
-
-
-Image DrawTrackLine(TrackSegment track, Image source, float height, float width);

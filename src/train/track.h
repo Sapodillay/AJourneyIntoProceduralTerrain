@@ -33,12 +33,12 @@ struct TrackCursor
 };
 
 void InitTrack();
-
 void RenderTrack();
 void RenderDebugTrack();
 void RenderDebugCursor();
-
 void UpdateTrainPosition();
+
+
 
 void AddLineSegment(Vector3 start, Vector3 end);
 void AddCurveSegment(Vector3 start, Vector3 end, Vector3 curveHandle);
@@ -48,13 +48,15 @@ void ExtendTrackForward(float length);
 void ExtendTrackCorner(bool direction, float length);
 
 
+
+void DrawTrackLine(TrackSegment track, float height, float width);
+
+
 //track helper functions
 Vector3 TrackToWorld(TrackCursor cursor);
 TrackCursor GetTrackForward(TrackCursor cursor, float distance);
 Vector3 GetTrackForwardVector(TrackCursor cursor);
-
 Vector3 GetSegmentDirection(TrackSegment segment);
-
 int GetLastTrack(int trackIndex);
 int GetNextTrack(int trackIndex);
 

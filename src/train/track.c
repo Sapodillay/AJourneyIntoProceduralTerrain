@@ -1,6 +1,7 @@
 #include "track.h"
 #include "raymath.h"
 #include "utils/mathutils.h"
+#include "utils/imageutils.h"
 #include "world/chunk.h"
 #include "trackModel.h"
 
@@ -228,6 +229,57 @@ void ExtendTrackCorner(bool direction, float length)
 	}
 
 	AddCurveSegment(lastSegment.endSegment, endVector, handle);
+}
+
+void DrawTrackLine(TrackSegment track, float height, float width)
+{
+	float scale = GetScale();
+
+	Vector2 startLine = (Vector2){track.startSegment.x, track.startSegment.z};
+	//scale to correct resolution.
+	startLine = Vector2Scale(startLine, scale);
+	startLine.x = (startLine.x - (track.chunkPosition.x * GetNoiseResolution().x));
+	startLine.y = (startLine.y - (track.chunkPosition.y * GetNoiseResolution().y));
+
+
+	Vector2 endLine = (Vector2){track.endSegment.x, track.endSegment.z};
+	endLine = Vector2Scale(endLine, scale);
+	endLine.x = (endLine.x - (track.chunkPosition.x * GetNoiseResolution().x));
+	endLine.y = (endLine.y - (track.chunkPosition.y * GetNoiseResolution().y));
+	
+	Color drawColor = HeightToGrayColor(height);
+	if (track.isCurve)
+	{
+
+		Vector2 curveHandle = (Vector2){track.curvePoint.x, track.curvePoint.z};
+		curveHandle = Vector2Scale(curveHandle, scale);
+		curveHandle.x = (curveHandle.x - (track.chunkPosition.x * GetNoiseResolution().x));
+		curveHandle.y = (curveHandle.y - (track.chunkPosition.y * GetNoiseResolution().y));
+		//scale
+
+		Vector2* points = malloc(sizeof(Vector2) * 3);
+		points[0] = startLine;
+		points[1] = curveHandle;
+		points[2] = endLine;
+
+		//fix rounding error
+		Vector2 nearEnd = GetSplinePointBezierQuad(startLine, curveHandle, endLine, 0.99);
+		Vector2 direction = Vector2Direction(nearEnd, endLine);
+		endLine = Vector2Subtract(endLine, direction);
+		points[2] = endLine;
+
+		DrawSplineBezierQuadratic(points, 3, width, drawColor);
+		free(points);
+	}
+	else
+	{
+
+		//account for pixel rounding error
+		Vector2 dir = Vector2Direction(startLine, endLine);
+		endLine = Vector2Subtract(endLine, dir);
+
+		DrawLineEx(startLine, endLine, width, drawColor);
+	}
 }
 
 Vector3 TrackToWorld(TrackCursor cursor)

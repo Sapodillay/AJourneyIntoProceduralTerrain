@@ -37,6 +37,12 @@ Model GenerateIslandModel(Vector2 position)
 	Image noiseImage = GenImagePerlinNoiseChunk(noiseResolution.x + 1, noiseResolution.y + 1, seed + xOffset - 1, seed + yOffset - 1, scale, octaves, persistence, lacunarity);
 	//Image noiseImage = GenImagePerlinNoise(noiseResolution.x, noiseResolution.y, xOffset, yOffset, 4.0f);
 
+	RenderTexture2D tex = LoadRenderTexture(noiseImage.width, noiseImage.height);
+	BeginTextureMode(tex);
+	ClearBackground(WHITE);
+
+	DrawTexture(LoadTextureFromImage(noiseImage), 0, 0, WHITE);
+
 
 	TrackSegment track = GetSegmentInChunk(position);
 	if (track.index != -1)
@@ -44,19 +50,19 @@ Model GenerateIslandModel(Vector2 position)
 		//ImageDrawLineV(&noiseImage, startLine, endLine, (Color){200, 200, 200, 255});
 		if (IsImageReady(noiseImage))
 		{
-			Image overlay = DrawTrackLine(track, noiseImage, TRAINTRACK_HEIGHT, 10.0f * GetScale());
-			Image dampenLayer = DrawTrackLine(track, noiseImage, TRAINTRACK_HEIGHT, 15.0f * GetScale());
-			ImageBlurGaussian(&dampenLayer, 10);
-			ImageDampen(&noiseImage, dampenLayer);
-			ImageOverlay(&noiseImage, overlay);
-
-			UnloadImage(dampenLayer);
-			UnloadImage(overlay);
+			DrawTrackLine(track, TRAINTRACK_HEIGHT, 10.0f * GetScale());
+			//DrawTrackLine(track, TRAINTRACK_HEIGHT, 25.0f * GetScale());
 		}
 	}
 
+	EndTextureMode();
+
+	Image texImage = LoadImageFromTexture(tex.texture);
+	ImageFlipVertical(&texImage);
+
+
 	//generate model
-	Model model = GenChunk(noiseImage, (Vector3){chunkSize.x, chunkSize.y * chunkHeight, chunkSize.y});
+	Model model = GenChunk(texImage, (Vector3){chunkSize.x, chunkSize.y * chunkHeight, chunkSize.y});
 	model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = chunkTexture;
 
 	UnloadImage(noiseImage);
