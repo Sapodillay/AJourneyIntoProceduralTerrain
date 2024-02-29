@@ -10,6 +10,8 @@ void RenderWater();
 
 
 Chunk GetChunk(Vector2 chunkPosition);
+Model GetWaterMesh();
+float GetWaterLevel();
 
 
 void UpdateChunks(Vector2 newChunkPosition);

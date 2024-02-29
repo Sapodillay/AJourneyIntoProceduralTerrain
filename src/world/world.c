@@ -90,6 +90,20 @@ Chunk GetChunk(Vector2 chunkPosition)
 	return emptyChunk;
 }
 
+Model GetWaterMesh()
+{
+	if (IsModelReady(waterModel))
+	{
+		return waterModel;
+	}
+	return (Model){ 0 };
+}
+
+float GetWaterLevel()
+{
+	return waterLevel;
+}
+
 void UpdateChunks(Vector2 newChunkPosition)
 {
 	centerChunk = newChunkPosition;
