@@ -2,8 +2,31 @@
 
 #include "raymath.h"
 
+
+Model frontCarriage;
+Model carriage;
+
+
+void InitTrackModels()
+{
+	frontCarriage = LoadModel("resources/models/train_front.obj");
+	carriage = LoadModel("resources/models/train_carriage.obj");
+
+}
+
+Model GetFrontTrainModel()
+{
+	return frontCarriage;
+}
+
+Model GetCarriageModel()
+{
+	return carriage;
+}
+
 Model GetTrackModel(Vector2 ChunkSize)
 {
+	//we want seperate model for each track?
 	return LoadModel("resources/track_board.obj");
 }
 
