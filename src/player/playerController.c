@@ -12,6 +12,9 @@
 Camera camera = { 0 };
 Ray groundRay = { 0 }; 
 
+
+static float playerHeight = 7.5f;
+
 void InitPlayerController()
 {
     camera.position = (Vector3){ 64.0f, 64.0f, 64.0f }; // Camera position
@@ -54,11 +57,69 @@ void handePlayerInput()
 	moveVector = Vector3Normalize(moveVector);
 	//update physics.
 	updatePlayerController(moveVector);
+	//handleGroundCollision();
+}
+
+void handleGroundCollision()
+{
+	//create ray at players position
+	groundRay.position = camera.position;
+	//set ray in the sky.
+	groundRay.position.y = 256.0f;
+	//point ray down.
+	groundRay.direction = (Vector3){0, -1, 0};
+
+	Vector2 chunkPos = WorldToChunkV3(groundRay.position);
+	//Ground check
+	Chunk chunk = GetChunk(chunkPos);
+	if (!chunk.isEmpty)
+	{
+		Mesh chunkMesh = chunk.chunkModel.meshes[0];
+		RayCollision rayCollision = GetRayCollisionMesh(groundRay, chunkMesh, MatrixTranslate(chunk.worldPosition.x, chunk.worldPosition.y, chunk.worldPosition.z));
+		if (rayCollision.hit)
+		{
+			//if chunk is above water level
+
+			float groundDistance =Vector3Distance(camera.position, rayCollision.point) - playerHeight;
+			float waterDistance = abs((GetWaterLevel() - camera.position.y)) - playerHeight;
+
+			if (groundDistance < waterDistance)
+			{
+				SetPlayerPosition(rayCollision.point);
+				TraceLog(LOG_INFO, "Ground");
+			}
+			else
+			{
+				Vector3 waterPosition = (Vector3){camera.position.x, GetWaterLevel(), camera.position.z};
+				SetPlayerPosition(waterPosition);
+				TraceLog(LOG_INFO, "Water");
+			}
+		}
+
+
+
+	}
+
+
 }
 
 void DrawPlayerDebug()
 {
 	DrawRay(groundRay, RED);
+}
+
+void SetPlayerPosition(Vector3 position)
+{
+	Vector3 difference = Vector3Subtract(camera.position, position);
+
+	Vector3 playerPosition = Vector3Subtract(camera.position, difference);
+	Vector3 targetPosition = Vector3Subtract(camera.target, difference);
+	//add player height to position.
+	playerPosition.y += playerHeight;
+	targetPosition.y += playerHeight;
+	//update camera
+	camera.position = playerPosition;
+	camera.target = targetPosition;
 }
 
 void updatePlayerController(Vector3 moveVector)
@@ -72,25 +133,6 @@ void updatePlayerController(Vector3 moveVector)
 	Vector2 mouseDelta = GetMouseDelta();
 	CameraYaw(&camera, -(mouseDelta.x * 0.01), false);
 	CameraPitch(&camera, -(mouseDelta.y * 0.01), true, false, false);
-
-
-
-	groundRay.position = camera.position;
-	groundRay.direction = (Vector3){0, -1, 0};
-
-	Vector2 chunkPos = WorldToChunkV3(groundRay.position);
-	//Ground check
-	Chunk chunk = GetChunk(chunkPos);
-	if (!chunk.isEmpty)
-	{
-		Mesh chunkMesh = chunk.chunkModel.meshes[0];
-		RayCollision rayCollision = GetRayCollisionMesh(groundRay, chunkMesh, MatrixTranslate(chunk.worldPosition.x, chunk.worldPosition.y, chunk.worldPosition.z));
-		if (rayCollision.hit)
-		{
-			Vector3 difference = Vector3Subtract(camera.position, rayCollision.point);
-		}
-	}
-
 
 }
 
