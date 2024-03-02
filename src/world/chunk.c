@@ -50,8 +50,28 @@ Model GenerateIslandModel(Vector2 position)
 		//ImageDrawLineV(&noiseImage, startLine, endLine, (Color){200, 200, 200, 255});
 		if (IsImageReady(noiseImage))
 		{
-			DrawTrackLine(track, TRAINTRACK_HEIGHT, 10.0f * GetScale());
-			//DrawTrackLine(track, TRAINTRACK_HEIGHT, 25.0f * GetScale());
+			//stop texture mode to draw to the blur layer.
+			EndTextureMode();
+
+			//blur layer
+			RenderTexture2D tex2 = LoadRenderTexture(noiseImage.width, noiseImage.height);
+			BeginTextureMode(tex2);
+				ClearBackground((Color){0.0f, 0.0f, 0.0f, 0.0f});
+				DrawTrackLine(track, TRAINTRACK_HEIGHT, 10.0f * GetScale());
+			EndTextureMode();
+			//blur line
+			Image blurLine = LoadImageFromTexture(tex2.texture);
+			ImageBlurGaussian(&blurLine, 5);
+			ImageFlipVertical(&blurLine);
+			Texture2D blurTexture = LoadTextureFromImage(blurLine);
+
+			//resume drawing to the noise
+			BeginTextureMode(tex);
+				BeginBlendMode(BLEND_ALPHA);
+					DrawTexture(blurTexture, 0, 0, WHITE);
+				EndBlendMode();
+				DrawTrackLine(track, TRAINTRACK_HEIGHT, 10.0f * GetScale());
+			
 		}
 	}
 
