@@ -5,6 +5,7 @@
 #include "world/world.h"
 
 #include "train/track.h"
+#include "train/trackModel.h"
 
 #include "player/playerController.h"
 #include "ui/debugUI.h"
@@ -22,6 +23,7 @@ void InitGame()
 	InitPlayerController();
 	InitChunkAssets();
 	InitWorld();
+	InitTrackModels();
 	InitTrack();
 
 	

@@ -16,7 +16,7 @@ OBJS = \
 	build/train/trackModel.o \
 
 CFLAGS = -Wall -std=c99 -Wno-missing-braces -g -DPLATFORM_DESKTOP
-INCLUDE_FLAGS = -I. -I./src -IC:/raylib/raylib/include
+INCLUDE_FLAGS = -I. -I./src -IC:/Tools/raylib/raylib/include
 LIB_FLAGS = -lraylib -lopengl32 -lgdi32 -lwinmm
 
 $(BUILD_DIR)/TrainTown: $(OBJS)

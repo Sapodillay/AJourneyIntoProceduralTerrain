@@ -48,12 +48,24 @@ void InitTrack()
 			ExtendTrackForward(length);
 		}
 	}
+
+	int startSegment = 4;
+	float length = 15.0f;
+
 	for (int i = 0; i < MAX_CURSORS; ++i)
 	{
-		TrackCursor cursor = { 0 };
-		cursor.currentSegment = segments[5 + i];
-		cursor.progress = 0.5f;
-		cursors[i] = cursor;
+		if (i == 0)
+		{
+			TrackCursor cursor = { 0 };
+			cursor.currentSegment = segments[startSegment];
+			cursors[i] = cursor;
+		}
+		else
+		{
+			TrackCursor cursor = GetTrackForward(cursors[i-1], length);
+			cursors[i] = cursor;
+		}
+
 		cursorAmount++;
 	}
 }
@@ -82,12 +94,25 @@ void RenderTrack()
 		Vector3 pos = TrackToWorld(cursor);
 		Vector3 forwardPos = TrackToWorld(GetTrackForward(cursor, 0.1f));
 		SetModelRotation(pos, forwardPos, &trackModel);
-
 		pos.y = GetTrackHeight();
 		
 		DrawSphere(pos, 0.1f, YELLOW);
 		DrawModel(trackModel, pos, 1.0f, WHITE);
 	}
+
+	for (int i = 0; i < cursorAmount; ++i)
+	{
+		Model trainModel = GetCarriageModel();
+		if (i == 0) { trainModel = GetFrontTrainModel();}
+
+		Vector3 pos = TrackToWorld(cursors[i]);
+		Vector3 forwardPos = TrackToWorld(GetTrackForward(cursors[i], 0.1f));
+		SetModelRotation(pos, forwardPos, &trainModel);
+		pos.y = GetTrackHeight();
+
+		DrawModel(trainModel, pos, 0.2f, WHITE);
+	}
+
 }
 
 void RenderDebugTrack()

@@ -1,16 +1,20 @@
 #include "trackModel.h"
 
 #include "raymath.h"
-
+#include "rlgl.h"
 
 Model frontCarriage;
 Model carriage;
+Model track;
 
 
 void InitTrackModels()
 {
-	frontCarriage = LoadModel("resources/models/train_front.obj");
-	carriage = LoadModel("resources/models/train_carriage.obj");
+	rlDisableBackfaceCulling();
+	frontCarriage = LoadModel("resources/models/train.glb");
+	track = LoadModel("resources/track_board.obj");
+	//carriage = LoadModel("resources/models/train_carriage.obj");
+	carriage = frontCarriage;
 
 }
 
@@ -27,7 +31,7 @@ Model GetCarriageModel()
 Model GetTrackModel(Vector2 ChunkSize)
 {
 	//we want seperate model for each track?
-	return LoadModel("resources/track_board.obj");
+	return track;
 }
 
 void SetModelRotation(Vector3 position, Vector3 forwardPosition, Model *model)
